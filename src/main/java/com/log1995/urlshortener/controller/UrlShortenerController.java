@@ -22,27 +22,27 @@ public class UrlShortenerController {
 //    }
 
     // 단축 URL 생성
-    @PostMapping("/makeShortenUrl")
-    public String changeUrl(@RequestBody String userUrl) {
-        String checkedUrl = urlShortenerService.checkingUrl(userUrl);
+    @PostMapping("/change")
+    public String changeUserUrlToShortenUrl(@RequestBody String userUrl) {
+        String checkedUrl = urlShortenerService.checkUrl(userUrl);
         return urlShortenerService.changeUrl(checkedUrl);
     }
 
     // 단축 URL Redirect
     @GetMapping("/{changedUrl}")
-    public RedirectView returnOriginalUrl(@PathVariable("changedUrl") String changeUrl) {
+    public RedirectView returnOriginalUrl(@PathVariable("changedUrl") String changedUrl) {
         RedirectView redirectView = new RedirectView();
 
-        String originUrl = urlShortenerService.findUrl(changeUrl);
+        String originUrl = urlShortenerService.findUrl(changedUrl);
         redirectView.setUrl(originUrl);
 
         return redirectView;
     }
 
     // 단축 URL 요청 횟수
-    @PostMapping("/returnResponseCount")
-    public int returnResponseCount(@RequestBody String url) {
-        return urlShortenerService.findResponseCount(url);
+    @PostMapping("/count")
+    public int returnResponseCount(@RequestBody String changedUrl) {
+        return urlShortenerService.findResponseCount(changedUrl);
     }
 
 }
