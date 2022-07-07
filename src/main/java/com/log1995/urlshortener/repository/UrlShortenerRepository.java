@@ -6,7 +6,7 @@ public interface UrlShortenerRepository {
 
     void saveUrl(User user);
 
-    String findUrl(String url);
+    User findOriginUrlInUser(String url);
 
-    int findResponseCount(String url);
+    User findResponseCountInUser(String url);
 }

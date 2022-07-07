@@ -1,6 +1,8 @@
 package com.log1995.urlshortener.service;
 
+import com.log1995.urlshortener.controller.UserDTO;
 import com.log1995.urlshortener.domain.User;
+import com.log1995.urlshortener.exception.NotContainHttpInUrlException;
 import com.log1995.urlshortener.repository.UrlShortenerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,29 +18,29 @@ public class UrlShortenerService {
     private static final int START = 48;
     private static final int END = 122;
     private static final int LIMIT = 10;
-    private final int INIT_COUNT = 0;
 
     @Autowired
     public UrlShortenerService(UrlShortenerRepository memoryUrlShortenerRepository) {
         this.memoryUrlShortenerRepository = memoryUrlShortenerRepository;
     }
 
-    public String checkUrl(String url) {
-        if(url.indexOf("http") == 0)
-            return url;
-        return "http://" + url;
+    public void checkUrl(String url) {
+        if(url.indexOf("http") == -1) {
+            throw new NotContainHttpInUrlException();
+        }
     }
 
-    public String changeUrl(String originUrl) {
-        String randomUrl = makeRandomUrl(originUrl);
-        User user = new User();
-        user.setOriginUrl(originUrl);
-        user.setChangedUrl(randomUrl);
-        user.setResponseTime(INIT_COUNT);
-
+    public String changeUrl(UserDTO userDTO) {
+        userDTO.setChangedUrl(makeRandomUrl(userDTO.getOriginUrl()));
+        User user = userDTO.dtoToEntity();
         saveUrl(user);
 
-        return localHost + randomUrl;
+        return localHost + userDTO.getChangedUrl();
+
+//        String randomUrl = makeRandomUrl(userDTO.getOriginUrl());
+//        User user = new User(userDTO.getOriginUrl(), randomUrl, INIT_COUNT);
+//        saveUrl(user);
+//        return localHost + randomUrl;
     }
 
     private String makeRandomUrl(String url) {
@@ -60,13 +62,15 @@ public class UrlShortenerService {
         memoryUrlShortenerRepository.saveUrl(user);
     }
 
-    public String findUrl(String changedUrl) {
-        return memoryUrlShortenerRepository.findUrl(changedUrl);
+    public String findOriginUrl(String changedUrl) {
+        UserDTO userDTO = new UserDTO(memoryUrlShortenerRepository.findOriginUrlInUser(changedUrl));
+        return userDTO.getOriginUrl();
     }
 
-    public int findResponseCount(String url) {
-        String[] uri = url.split("/");
-        return memoryUrlShortenerRepository.findResponseCount(uri[1]);
+    public int findResponseCount(String changedUrl) {
+        String[] uri = changedUrl.split("/");
+        UserDTO userDTO = new UserDTO(memoryUrlShortenerRepository.findResponseCountInUser(uri[1]));
+        return userDTO.getResponseTime();
     }
 
 

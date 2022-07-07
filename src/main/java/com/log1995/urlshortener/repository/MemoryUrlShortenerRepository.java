@@ -1,5 +1,6 @@
 package com.log1995.urlshortener.repository;
 
+import com.log1995.urlshortener.exception.CannotFoundUrlException;
 import com.log1995.urlshortener.domain.User;
 import org.springframework.stereotype.Repository;
 
@@ -18,24 +19,38 @@ public class MemoryUrlShortenerRepository implements UrlShortenerRepository{
     }
 
     @Override
-    public String findUrl(String changedUrl) {
-       for(User user : urlList) {
+    public User findOriginUrlInUser(String changedUrl) {
+        user = null;
+
+        for(User user : urlList) {
            if(user.getChangedUrl().equals(changedUrl)) {
                user.setResponseTime(user.getResponseTime() + 1);
                this.user = user;
            }
        }
-      return user.getOriginUrl();
+
+       if(user == null) {
+           throw new CannotFoundUrlException();
+       }
+
+      return user;
     }
 
     @Override
-    public int findResponseCount(String url) {
+    public User findResponseCountInUser(String changedUrl) {
+        user = null;
+
         for(User user : urlList) {
-            if(user.getChangedUrl().equals(url)) {
+            if(user.getChangedUrl().equals(changedUrl)) {
                 this.user = user;
             }
         }
-        return user.getResponseTime();
+
+        if(user == null) {
+            throw new CannotFoundUrlException();
+        }
+
+        return user;
     }
 
 

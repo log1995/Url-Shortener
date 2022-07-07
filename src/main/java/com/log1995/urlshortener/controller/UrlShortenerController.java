@@ -2,8 +2,12 @@ package com.log1995.urlshortener.controller;
 
 import com.log1995.urlshortener.service.UrlShortenerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
+
+import java.net.URI;
 
 @RestController
 public class UrlShortenerController {
@@ -23,25 +27,39 @@ public class UrlShortenerController {
 
     // 단축 URL 생성
     @PostMapping("/change")
-    public String changeUserUrlToShortenUrl(@RequestBody String userUrl) {
-        String checkedUrl = urlShortenerService.checkUrl(userUrl);
-        return urlShortenerService.changeUrl(checkedUrl);
+    public String changeUserUrlToShortenUrl(@RequestBody UserDTO userDTO) {
+        urlShortenerService.checkUrl(userDTO.getOriginUrl());
+        return urlShortenerService.changeUrl(userDTO);
     }
+
+//    // 단축 URL Redirect
+//    @GetMapping("/{changedUrl}")
+//    public RedirectView returnOriginalUrl(@PathVariable("changedUrl") String changedUrl) {
+//        RedirectView redirectView = new RedirectView();
+//
+//        String originUrl = urlShortenerService.findUrl(changedUrl);
+//        redirectView.setUrl(originUrl);
+//
+//        return redirectView;
+//    }
 
     // 단축 URL Redirect
     @GetMapping("/{changedUrl}")
-    public RedirectView returnOriginalUrl(@PathVariable("changedUrl") String changedUrl) {
-        RedirectView redirectView = new RedirectView();
+    public ResponseEntity urlRedirect(@PathVariable("changedUrl") String changedUrl) {
 
-        String originUrl = urlShortenerService.findUrl(changedUrl);
-        redirectView.setUrl(originUrl);
+        String originUrl = urlShortenerService.findOriginUrl(changedUrl);
 
-        return redirectView;
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setLocation(URI.create(originUrl));
+        responseHeaders.set("UrlShortener", "log1995");
+
+        return new ResponseEntity("UrlShortener", responseHeaders, HttpStatus.MOVED_PERMANENTLY);
+
     }
 
     // 단축 URL 요청 횟수
-    @PostMapping("/count")
-    public int returnResponseCount(@RequestBody String changedUrl) {
+    @GetMapping("/count")
+    public int returnResponseCount(@RequestParam("url") String changedUrl) {
         return urlShortenerService.findResponseCount(changedUrl);
     }
 
