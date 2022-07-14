@@ -1,14 +1,17 @@
-package com.log1995.urlshortener.repository;
+package com.log1995.urlshortener.infrastructure;
 
+import com.log1995.urlshortener.domain.UrlShortenerRepository;
 import com.log1995.urlshortener.exception.CannotFoundUrlException;
 import com.log1995.urlshortener.domain.User;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Profile("memory")
 @Repository
-public class MemoryUrlShortenerRepository implements UrlShortenerRepository{
+public class MemoryUrlShortenerRepository implements UrlShortenerRepository {
 
     private User user;
     private static List<User> urlList = new ArrayList<>();
@@ -53,6 +56,23 @@ public class MemoryUrlShortenerRepository implements UrlShortenerRepository{
         return user;
     }
 
+
+    @Override
+    public User findChangedUrlInUser(String originUrl) {
+        user = null;
+
+        for(User user : urlList) {
+            if(user.getChangedUrl().equals(originUrl)) {
+                this.user = user;
+            }
+        }
+
+        if(user == null) {
+            throw new CannotFoundUrlException();
+        }
+
+        return user;
+    }
 
 
 

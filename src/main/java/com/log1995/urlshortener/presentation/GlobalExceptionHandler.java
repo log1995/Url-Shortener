@@ -1,4 +1,4 @@
-package com.log1995.urlshortener.controller;
+package com.log1995.urlshortener.presentation;
 
 import com.log1995.urlshortener.exception.UrlShortenerException;
 import org.springframework.http.HttpStatus;

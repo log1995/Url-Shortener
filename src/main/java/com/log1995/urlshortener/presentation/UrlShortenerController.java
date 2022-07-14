@@ -1,6 +1,6 @@
-package com.log1995.urlshortener.controller;
+package com.log1995.urlshortener.presentation;
 
-import com.log1995.urlshortener.service.UrlShortenerService;
+import com.log1995.urlshortener.application.UrlShortenerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ public class UrlShortenerController {
 
     // 단축 URL 생성
     @PostMapping("/change")
-    public String changeUserUrlToShortenUrl(@RequestBody UserDTO userDTO) {
+    public String changeUserUrlToShortenUrl(@RequestBody UserDto userDTO) {
         urlShortenerService.checkUrl(userDTO.getOriginUrl());
         return urlShortenerService.changeUrl(userDTO);
     }

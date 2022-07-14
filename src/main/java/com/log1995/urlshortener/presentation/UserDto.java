@@ -1,14 +1,14 @@
-package com.log1995.urlshortener.controller;
+package com.log1995.urlshortener.presentation;
 
 import com.log1995.urlshortener.domain.User;
 
-public class UserDTO {
+public class UserDto {
 
     private String originUrl;
     private String changedUrl;
     private int responseTime;
 
-    public UserDTO() {
+    public UserDto() {
         this.responseTime = 0;
     }
 
@@ -42,7 +42,7 @@ public class UserDTO {
     }
 
     // Entity -> DTO
-    public UserDTO(User user) {
+    public UserDto(User user) {
         this.originUrl = user.getOriginUrl();
         this.changedUrl = user.getChangedUrl();
         this.responseTime = user.getResponseTime();
