@@ -33,14 +33,14 @@ public class UrlShortenerService {
     }
 
     public String changeUrl(UserDto userDTO) {
-        userDTO.setChangedUrl(makeRandomUrl(userDTO.getOriginUrl()));
+        userDTO.setChangedUrl(makeRandomUrl());
         User user = userDTO.dtoToEntity();
         saveUrl(user);
 
         return localHost + userDTO.getChangedUrl();
     }
 
-    private String makeRandomUrl(String url) {
+    private String makeRandomUrl() {
         Random random = new Random();
         String randomString = random.ints(START, END + 1)
                 .filter(i -> isRightRange(i))

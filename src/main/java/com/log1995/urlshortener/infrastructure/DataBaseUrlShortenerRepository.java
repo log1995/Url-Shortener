@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-@Profile("db")
+@Profile({"prod", "dev"})
 @Repository
 public class DataBaseUrlShortenerRepository implements UrlShortenerRepository {
 

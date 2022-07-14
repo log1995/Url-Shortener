@@ -11,33 +11,56 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.OngoingStubbing;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UrlShortenerServiceTest {
 
-    @InjectMocks
-    private MemoryUrlShortenerRepository memoryUrlShortenerRepository;
-
     @Mock
+    private UrlShortenerRepository urlShortenerRepository;
+
+
+    @InjectMocks
     private UrlShortenerService urlShortenerService;
 
     @Test
     public void save() {
-        User user = new User();
-        user.setOriginUrl("https://naver.com");
-        user.setChangedUrl("q1w2e3r4t5");
-        user.setResponseTime(0);
+        // Given
+        String ORIGIN_URL = "https://www.naver.com";
 
-        memoryUrlShortenerRepository.saveUrl(user);
+        UserDto userDto = new UserDto();
+        userDto.setOriginUrl(ORIGIN_URL);
+        
+        // when
+         when(urlShortenerRepository.findOriginUrlInUser(any())).thenReturn(new User(ORIGIN_URL, "1q2w3e4r", 0));
+         String originUrl = urlShortenerService.findOriginUrl("ddd");
 
-
-        when(memoryUrlShortenerRepository.findOriginUrlInUser(user.getChangedUrl())).thenReturn(user);
-
-        User user1 = memoryUrlShortenerRepository.findOriginUrlInUser(user.getChangedUrl());
-        assertThat(user.getOriginUrl()).isEqualTo(user1.getOriginUrl());
+        // then
+         assertThat(userDto.getOriginUrl()).isEqualTo(originUrl);
     }
+
+//    public User(String originUrl, String changedUrl, int responseTime) {
+//        this.originUrl = originUrl;
+//        this.changedUrl = changedUrl;
+//        this.responseTime = responseTime;
+//    }
+
+//    @Test
+//    void 원본URL을_단축하고_조회하면_원본URL이_조회된다() {
+//        UserDto userDto = new UserDto();
+//        userDto.setOriginUrl("https://www.naver.com");
+//
+//        urlShortenerService.changeUrl(userDto);
+//        // 변경 + 저장
+//
+////        String changedUrl = urlShortenerService.findChangedUrl(userDto.getOriginUrl());
+//
+//        String originUrl = urlShortenerService.findOriginUrl(userDto.getChangedUrl());
+//        assertThat(userDto.getOriginUrl()).isEqualTo(originUrl);
+//    }
 
 }
