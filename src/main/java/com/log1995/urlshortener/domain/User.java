@@ -31,23 +31,15 @@ public class User {
         return originUrl;
     }
 
-    public void setOriginUrl(String originUrl) {
-        this.originUrl = originUrl;
-    }
-
     public String getChangedUrl() {
         return changedUrl;
-    }
-
-    public void setChangedUrl(String changedUrl) {
-        this.changedUrl = changedUrl;
     }
 
     public int getResponseTime() {
         return responseTime;
     }
 
-    public void setResponseTime(int responseTime) {
-        this.responseTime = responseTime;
+    public void increaseResponseTime() {
+        this.responseTime = this.responseTime + 1;
     }
 }

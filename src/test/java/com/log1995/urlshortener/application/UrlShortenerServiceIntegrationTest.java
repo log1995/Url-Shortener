@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@Profile("prod")
+@Profile("test")
 @SpringBootTest
 @Transactional
 class UrlShortenerServiceIntegrationTest {

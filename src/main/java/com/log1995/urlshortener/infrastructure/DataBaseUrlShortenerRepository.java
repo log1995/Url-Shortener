@@ -26,27 +26,16 @@ public class DataBaseUrlShortenerRepository implements UrlShortenerRepository {
     }
 
     @Override
-    public User findOriginUrlInUser(String url) {
+    public User findUserByChangedUrl(String url) {
         List<User> resultList =  em.createQuery("select u from User u where u.changedUrl = :url", User.class)
                 .setParameter("url", url)
                 .getResultList();
         User user = resultList.get(0);
-        user.setResponseTime(user.getResponseTime() + 1);
         return user;
     }
 
     @Override
-    public User findResponseCountInUser(String url) {
-        List<User> resultList =  em.createQuery("select u from User u where u.changedUrl = :url", User.class)
-                .setParameter("url", url)
-                .getResultList();
-        User user = resultList.get(0);
-
-        return user;
-    }
-
-    @Override
-    public User findChangedUrlInUser(String originUrl) {
+    public User findUserByOriginUrl(String originUrl) {
         List<User> resultList =  em.createQuery("select u from User u where u.originUrl = :url", User.class)
                 .setParameter("url", originUrl)
                 .getResultList();

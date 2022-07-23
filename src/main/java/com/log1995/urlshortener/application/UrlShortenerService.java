@@ -60,18 +60,25 @@ public class UrlShortenerService {
     }
 
     public String findOriginUrl(String changedUrl) {
-        UserDto userDTO = new UserDto(urlShortenerRepository.findOriginUrlInUser(changedUrl));
-        return userDTO.getOriginUrl();
+        User user = urlShortenerRepository.findUserByChangedUrl(changedUrl); // 1. User 조회
+
+        user.increaseResponseTime();                // 2. User에게 행동을 시킴
+        urlShortenerRepository.saveUrl(user);       // 3. User를 저장
+
+//        UserDto userDTO = new UserDto(user);        // 4. User -> UserDto로 변환
+        return user.getOriginUrl();              // 5. UserDto 반환
     }
 
     public int findResponseCount(String changedUrl) {
         String[] uri = changedUrl.split("/");
-        UserDto userDTO = new UserDto(urlShortenerRepository.findResponseCountInUser(uri[1]));
-        return userDTO.getResponseTime();
+
+        User user = urlShortenerRepository.findUserByChangedUrl(uri[1]);
+//        UserDto userDTO = new UserDto(user);
+        return user.getResponseTime();
     }
 
     public String findChangedUrl(String originUrl) {
-        UserDto userDto = new UserDto(urlShortenerRepository.findChangedUrlInUser(originUrl));
+        UserDto userDto = new UserDto(urlShortenerRepository.findUserByOriginUrl(originUrl));
         return userDto.getChangedUrl();
     }
 

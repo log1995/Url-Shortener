@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public class MemoryUrlShortenerRepository implements UrlShortenerRepository {
 
-    private User user;
+//    private User user;  // -> 위험한 코드 , 빈이 상태를 가지는 것. 공유 자원이 됨. Race Condition
     private static List<User> urlList = new ArrayList<>();
 
     @Override
@@ -22,56 +22,32 @@ public class MemoryUrlShortenerRepository implements UrlShortenerRepository {
     }
 
     @Override
-    public User findOriginUrlInUser(String changedUrl) {
-        user = null;
-
-        for(User user : urlList) {
-           if(user.getChangedUrl().equals(changedUrl)) {
-               user.setResponseTime(user.getResponseTime() + 1);
-               this.user = user;
-           }
-       }
-
-       if(user == null) {
-           throw new CannotFoundUrlException();
-       }
+    public User findUserByChangedUrl(String changedUrl) {
+        User user = urlList.stream()
+                .filter(url -> url.getChangedUrl().equals(changedUrl))
+                .findFirst()
+                .orElseThrow(() -> {
+                    throw new CannotFoundUrlException();
+                });
 
       return user;
     }
 
     @Override
-    public User findResponseCountInUser(String changedUrl) {
-        user = null;
+    public User findUserByOriginUrl(String originUrl) {
+//        user = null;
+//
+//        for(User user : urlList) {
+//            if(user.getChangedUrl().equals(originUrl)) {
+//                this.user = user;
+//            }
+//        }
+//
+//        if(user == null) {
+//            throw new CannotFoundUrlException();
+//        }
 
-        for(User user : urlList) {
-            if(user.getChangedUrl().equals(changedUrl)) {
-                this.user = user;
-            }
-        }
-
-        if(user == null) {
-            throw new CannotFoundUrlException();
-        }
-
-        return user;
-    }
-
-
-    @Override
-    public User findChangedUrlInUser(String originUrl) {
-        user = null;
-
-        for(User user : urlList) {
-            if(user.getChangedUrl().equals(originUrl)) {
-                this.user = user;
-            }
-        }
-
-        if(user == null) {
-            throw new CannotFoundUrlException();
-        }
-
-        return user;
+        return null;
     }
 
 

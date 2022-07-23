@@ -51,9 +51,8 @@ public class UrlShortenerController {
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(URI.create(originUrl));
-        responseHeaders.set("UrlShortener", "log1995");
 
-        return new ResponseEntity("UrlShortener", responseHeaders, HttpStatus.MOVED_PERMANENTLY);
+        return new ResponseEntity("Redirect to " + originUrl, responseHeaders, HttpStatus.MOVED_PERMANENTLY);
 
     }
 

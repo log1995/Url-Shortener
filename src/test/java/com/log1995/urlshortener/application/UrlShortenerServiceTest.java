@@ -34,7 +34,7 @@ public class UrlShortenerServiceTest {
         userDto.setOriginUrl(ORIGIN_URL);
         
         // when
-         when(urlShortenerRepository.findOriginUrlInUser(any())).thenReturn(new User(ORIGIN_URL, "1q2w3e4r", 0));
+         when(urlShortenerRepository.findUserByChangedUrl(any())).thenReturn(new User(ORIGIN_URL, "1q2w3e4r", 0));
          String originUrl = urlShortenerService.findOriginUrl("ddd");
 
         // then
@@ -42,16 +42,19 @@ public class UrlShortenerServiceTest {
     }
 
     @Test
-    public void count() {
+    public void findResponseCount에_changedUrl로_조회하면_responseTime을_조회할_수_있다() {
         // Given
         String ORIGIN_URL = "https://www.naver.com";
+        String CHANGED_URL = "1q2w3e4r";
         int RESPONSE_COUNT = 1;
 
         UserDto userDto = new UserDto();
         userDto.setResponseTime(RESPONSE_COUNT);
 
-        when(urlShortenerRepository.findResponseCountInUser(any())).thenReturn(new User(ORIGIN_URL, "1q2w3e4r", 1));
-        int responseTime = urlShortenerService.findResponseCount("ddd/ddd");
+        when(urlShortenerRepository.findUserByChangedUrl(CHANGED_URL))
+                .thenReturn(new User(ORIGIN_URL, CHANGED_URL, RESPONSE_COUNT));
+
+        int responseTime = urlShortenerService.findResponseCount("ddd/" + CHANGED_URL);
 
         assertTrue(userDto.getResponseTime() == responseTime);
     }
