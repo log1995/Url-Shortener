@@ -3,16 +3,16 @@ package com.log1995.urlshortener.domain;
 import javax.persistence.*;
 
 @Entity
-public class User {
+public class ShortenUrl {
 
-    public User() {
+    public ShortenUrl() {
 
     }
 
-    public User(String originUrl, String changedUrl, int responseTime) {
+    public ShortenUrl(String originUrl, String changedUrl, int viewCount) {
         this.originUrl = originUrl;
         this.changedUrl = changedUrl;
-        this.responseTime = responseTime;
+        this.viewCount = viewCount;
     }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +24,8 @@ public class User {
     @Column(name = "CHANGEDURL")
     private String changedUrl;
 
-    @Column(name = "RESPONSETIME")
-    private Integer responseTime;
+    @Column(name = "VIEWCOUNT")
+    private Integer viewCount;
 
     public String getOriginUrl() {
         return originUrl;
@@ -35,11 +35,11 @@ public class User {
         return changedUrl;
     }
 
-    public int getResponseTime() {
-        return responseTime;
+    public int getViewCount() {
+        return viewCount;
     }
 
-    public void increaseResponseTime() {
-        this.responseTime = this.responseTime + 1;
+    public void increaseViewCount() {
+        this.viewCount = this.viewCount + 1;
     }
 }

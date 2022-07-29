@@ -1,7 +1,7 @@
 package com.log1995.urlshortener.infrastructure;
 
 import com.log1995.urlshortener.domain.UrlShortenerRepository;
-import com.log1995.urlshortener.domain.User;
+import com.log1995.urlshortener.domain.ShortenUrl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
@@ -21,27 +21,37 @@ public class DataBaseUrlShortenerRepository implements UrlShortenerRepository {
     }
 
     @Override
-    public void saveUrl(User user) {
-        em.persist(user);
+    public void saveUrl(ShortenUrl shortenUrl) {
+        em.persist(shortenUrl);
     }
 
     @Override
-    public User findUserByChangedUrl(String url) {
-        List<User> resultList =  em.createQuery("select u from User u where u.changedUrl = :url", User.class)
+    public ShortenUrl findUserByChangedUrl(String url) {
+        List<ShortenUrl> resultList =  em.createQuery("select u from User u where u.changedUrl = :url", ShortenUrl.class)
                 .setParameter("url", url)
                 .getResultList();
-        User user = resultList.get(0);
-        return user;
+        ShortenUrl shortenUrl = resultList.get(0);
+        return shortenUrl;
     }
 
     @Override
-    public User findUserByOriginUrl(String originUrl) {
-        List<User> resultList =  em.createQuery("select u from User u where u.originUrl = :url", User.class)
+    public ShortenUrl findUserByOriginUrl(String originUrl) {
+        List<ShortenUrl> resultList =  em.createQuery("select u from User u where u.originUrl = :url", ShortenUrl.class)
                 .setParameter("url", originUrl)
                 .getResultList();
-        User user = resultList.get(0);
+        ShortenUrl shortenUrl = resultList.get(0);
 
-        return user;
+        return shortenUrl;
     }
 
+    @Override
+    public boolean findSameChangedUrlInRepository(String changedUrl) {
+        List<ShortenUrl> resultList =  em.createQuery("select u from User u where u.changedUrl = :changedUrl", ShortenUrl.class)
+                .setParameter("changedUrl", changedUrl)
+                .getResultList();
+        if(resultList.get(0) != null) {
+            return true;
+        }
+        return false;
+    }
 }

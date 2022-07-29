@@ -27,39 +27,26 @@ public class UrlShortenerController {
 
     // 단축 URL 생성
     @PostMapping("/change")
-    public String changeUserUrlToShortenUrl(@RequestBody UserDto userDTO) {
-        urlShortenerService.checkUrl(userDTO.getOriginUrl());
-        return urlShortenerService.changeUrl(userDTO);
+    public String changeUserUrlToShortenUrl(@RequestBody ShortenUrlResponseDto shortenUrlResponseDTO) {
+        urlShortenerService.checkHttpContainInUrl(shortenUrlResponseDTO.getOriginUrl());
+        return urlShortenerService.changeUrl(shortenUrlResponseDTO);
     }
-
-//    // 단축 URL Redirect
-//    @GetMapping("/{changedUrl}")
-//    public RedirectView returnOriginalUrl(@PathVariable("changedUrl") String changedUrl) {
-//        RedirectView redirectView = new RedirectView();
-//
-//        String originUrl = urlShortenerService.findUrl(changedUrl);
-//        redirectView.setUrl(originUrl);
-//
-//        return redirectView;
-//    }
 
     // 단축 URL Redirect
     @GetMapping("/{changedUrl}")
     public ResponseEntity urlRedirect(@PathVariable("changedUrl") String changedUrl) {
-
         String originUrl = urlShortenerService.findOriginUrl(changedUrl);
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(URI.create(originUrl));
 
         return new ResponseEntity("Redirect to " + originUrl, responseHeaders, HttpStatus.MOVED_PERMANENTLY);
-
     }
 
     // 단축 URL 요청 횟수
     @GetMapping("/count")
     public int returnResponseCount(@RequestParam("url") String changedUrl) {
-        return urlShortenerService.findResponseCount(changedUrl);
+        return urlShortenerService.findViewCount(changedUrl);
     }
 
 }

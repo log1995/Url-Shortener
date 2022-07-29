@@ -2,9 +2,11 @@ package com.log1995.urlshortener.domain;
 
 public interface UrlShortenerRepository {
 
-    void saveUrl(User user);
+    void saveUrl(ShortenUrl shortenUrl);
 
-    User findUserByChangedUrl(String changedUrl);
+    ShortenUrl findUserByChangedUrl(String changedUrl);
 
-    User findUserByOriginUrl(String originUrl);
+    ShortenUrl findUserByOriginUrl(String originUrl);
+
+    boolean findSameChangedUrlInRepository(String changedUrl);
 }

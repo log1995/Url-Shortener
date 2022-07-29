@@ -1,7 +1,7 @@
 package com.log1995.urlshortener.application;
 
 import com.log1995.urlshortener.domain.UrlShortenerRepository;
-import com.log1995.urlshortener.presentation.UserDto;
+import com.log1995.urlshortener.presentation.ShortenUrlResponseDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,28 +21,37 @@ class UrlShortenerServiceIntegrationTest {
 
     @Test
     void 원본URL을_단축하고_조회하면_원본URL이_조회된다() {
-        UserDto userDto = new UserDto();
-        userDto.setOriginUrl("https://www.naver.com");
+        ShortenUrlResponseDto shortenUrlResponseDto = new ShortenUrlResponseDto();
+        shortenUrlResponseDto.setOriginUrl("https://www.naver.com");
 
-        urlShortenerService.changeUrl(userDto);
+        urlShortenerService.changeUrl(shortenUrlResponseDto);
         // 변경 + 저장
 
-//        String changedUrl = urlShortenerService.findChangedUrl(userDto.getOriginUrl());
-
-        String originUrl = urlShortenerService.findOriginUrl(userDto.getChangedUrl());
-        assertThat(userDto.getOriginUrl()).isEqualTo(originUrl);
+        String originUrl = urlShortenerService.findOriginUrl(shortenUrlResponseDto.getChangedUrl());
+        assertThat(shortenUrlResponseDto.getOriginUrl()).isEqualTo(originUrl);
     }
 
     @Test
     void 단축URL을_조회하면_조회_횟수가_1씩_증가한다() {
-        UserDto userDto = new UserDto();
-        userDto.setOriginUrl("https://www.naver.com");
+        ShortenUrlResponseDto shortenUrlResponseDto = new ShortenUrlResponseDto();
+        shortenUrlResponseDto.setOriginUrl("https://www.naver.com");
 
-        urlShortenerService.changeUrl(userDto);
-        urlShortenerService.findOriginUrl(userDto.getChangedUrl());
+        urlShortenerService.changeUrl(shortenUrlResponseDto);
+        urlShortenerService.findOriginUrl(shortenUrlResponseDto.getChangedUrl());
 
-        int responseCount = urlShortenerService.findResponseCount("localhost:8080/" + userDto.getChangedUrl());
-        assertTrue(responseCount == 1);
+        int viewCount = urlShortenerService.findViewCount("localhost:8080/" + shortenUrlResponseDto.getChangedUrl());
+        assertTrue(viewCount == 1);
+    }
+
+    @Test
+    void 단축URL을_생성하여_중복검사를_하면_true를_반환한다() {
+        ShortenUrlResponseDto shortenUrlResponseDto = new ShortenUrlResponseDto();
+        shortenUrlResponseDto.setOriginUrl("https://www.naver.com");
+
+        urlShortenerService.changeUrl(shortenUrlResponseDto);
+
+        boolean isSameChangedUrl = urlShortenerRepository.findSameChangedUrlInRepository(shortenUrlResponseDto.getChangedUrl());
+        assertTrue(isSameChangedUrl == true);
     }
 
 }
