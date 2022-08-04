@@ -1,22 +1,27 @@
 package com.log1995.urlshortener.application;
 
+import com.log1995.urlshortener.exception.CannotFoundUrlException;
+import com.log1995.urlshortener.exception.TryAgainException;
 import com.log1995.urlshortener.presentation.ShortenUrlResponseDto;
-import com.log1995.urlshortener.domain.ShortenUrl;
-import com.log1995.urlshortener.exception.NotContainHttpInUrlException;
+import com.log1995.urlshortener.domain.ShortenUrlInfo;
+import com.log1995.urlshortener.exception.InValidUrlException;
 import com.log1995.urlshortener.domain.UrlShortenerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 @Transactional
 @Service
 public class UrlShortenerService {
 
+    @Autowired
     private final UrlShortenerRepository urlShortenerRepository;
 
-    private final String localHost = "localhost:8080/";
+    private static final int MAX_TRY = 10;
     private static final int START = 48;
     private static final int END = 122;
     private static final int LIMIT = 10;
@@ -31,74 +36,73 @@ public class UrlShortenerService {
         this.urlShortenerRepository = urlShortenerRepository;
     }
 
-    public void checkHttpContainInUrl(String url) {
-        if(url.indexOf("http") == -1) {
-            throw new NotContainHttpInUrlException();
+    public void checkValidationOfUrl(String url) {
+        String regex = "^((http|https)://)?(www\\.)?[a-zA-Z0-9]+\\.[a-z]+(\\.[a-z]+)?";
+        if(Pattern.matches(regex, url)) {
+           return;
         }
+        throw new InValidUrlException();
     }
 
-    private String checkSameChangedUrlInRepository() {
-        boolean existSameChangedUrl;
-        String randomUrl;
+    public String makeRandomUrl() {
+        int tryCount = 0;
 
-        do {
-           randomUrl = makeRandomUrl();
-           existSameChangedUrl = urlShortenerRepository.findSameChangedUrlInRepository(randomUrl);
-        } while(existSameChangedUrl);
+        while(tryCount < MAX_TRY) {
+            Random random = new Random();
+            String randomString = random.ints(START, END + 1)
+                    .filter(i -> isRightRange(i))
+                    .limit(LIMIT)
+                    .collect(StringBuffer::new, StringBuffer::appendCodePoint, StringBuffer::append)
+                    .toString();
 
-        return randomUrl;
+            if(checkSameChangedUrlInRepository(randomString)) {
+                return randomString;
+            }
 
-    }
-
-
-//    memberRepository.findByName(member.getName())
-//            .ifPresent(m -> {
-//        throw new IllegalStateException("이미 존재하는 회원입니다.");
-//    });
-
-    public String changeUrl(ShortenUrlResponseDto shortenUrlResponseDTO) {
-        String randomUrl = checkSameChangedUrlInRepository();
-
-        shortenUrlResponseDTO.setChangedUrl(randomUrl);
-        ShortenUrl shortenUrl = shortenUrlResponseDTO.dtoToEntity();
-        saveUrl(shortenUrl);
-
-        return localHost + shortenUrlResponseDTO.getChangedUrl();
-    }
-
-    private String makeRandomUrl() {
-        Random random = new Random();
-        String randomString = random.ints(START, END + 1)
-                .filter(i -> isRightRange(i))
-                .limit(LIMIT)
-                .collect(StringBuffer::new, StringBuffer::appendCodePoint, StringBuffer::append)
-                .toString();
-
-        return randomString;
+            tryCount++;
+        }
+        throw new TryAgainException();
     }
 
     private boolean isRightRange(int i) {
         return (i <= NUM_NINE || i >= ALPHABET_A) && (i <= ALPHABET_Z || i >= ALPHABET_a);
     }
 
-    private void saveUrl(ShortenUrl shortenUrl) {
-        urlShortenerRepository.saveUrl(shortenUrl);
+    private boolean checkSameChangedUrlInRepository(String radomString) {
+        List<ShortenUrlInfo> shortenUrlInfoList = urlShortenerRepository.findShortenUrlInfoByChangedUrl(radomString);
+        if(shortenUrlInfoList.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    public void saveUrlInfo(ShortenUrlResponseDto shortenUrlResponseDTO) {
+        ShortenUrlInfo shortenUrlInfo = shortenUrlResponseDTO.dtoToEntity();
+        urlShortenerRepository.saveShortenUrlInfo(shortenUrlInfo);
     }
 
     public String findOriginUrl(String changedUrl) {
-        ShortenUrl shortenUrl = urlShortenerRepository.findUserByChangedUrl(changedUrl); // 1. shortenUrl 조회
+        List<ShortenUrlInfo> shortenUrlInfoList = urlShortenerRepository.findShortenUrlInfoByChangedUrl(changedUrl); // 1. shortenUrl 조회
+        if(shortenUrlInfoList.isEmpty()) {
+            throw new CannotFoundUrlException();
+        }
+        ShortenUrlInfo shortenUrlInfo = shortenUrlInfoList.get(0);
 
-        shortenUrl.increaseViewCount();                // 2. shortenUrl에게 행동을 시킴(응답횟수 증가)
-        urlShortenerRepository.saveUrl(shortenUrl);       // 3. shortenUrl를 저장
+        shortenUrlInfo.increaseViewCount();                // 2. shortenUrl에게 행동을 시킴(응답횟수 증가)
+        urlShortenerRepository.saveShortenUrlInfo(shortenUrlInfo);       // 3. shortenUrl를 저장
 
-        return shortenUrl.getOriginUrl();              // 4. shortenUrl 반환
+        return shortenUrlInfo.getOriginUrl();              // 4. shortenUrl 반환
     }
 
     public int findViewCount(String changedUrl) {
         String[] uri = changedUrl.split("/");
-        ShortenUrl shortenUrl = urlShortenerRepository.findUserByChangedUrl(uri[1]);
+        List<ShortenUrlInfo> shortenUrlInfoList = urlShortenerRepository.findShortenUrlInfoByChangedUrl(uri[1]);
+        if(shortenUrlInfoList.isEmpty()) {
+            throw new CannotFoundUrlException();
+        }
+        ShortenUrlInfo shortenUrlInfo = shortenUrlInfoList.get(0);
 
-        return shortenUrl.getViewCount();
+        return shortenUrlInfo.getViewCount();
     }
 
 }

@@ -1,6 +1,6 @@
 package com.log1995.urlshortener.presentation;
 
-import com.log1995.urlshortener.domain.ShortenUrl;
+import com.log1995.urlshortener.domain.ShortenUrlInfo;
 
 public class ShortenUrlResponseDto {
 
@@ -37,15 +37,15 @@ public class ShortenUrlResponseDto {
     }
 
     // DTO -> Entity
-    public ShortenUrl dtoToEntity() {
-        return new ShortenUrl(this.originUrl, this.changedUrl, this.viewCount);
+    public ShortenUrlInfo dtoToEntity() {
+        return new ShortenUrlInfo(this.originUrl, this.changedUrl, this.viewCount);
     }
 
     // Entity -> DTO
-    public ShortenUrlResponseDto(ShortenUrl shortenUrl) {
-        this.originUrl = shortenUrl.getOriginUrl();
-        this.changedUrl = shortenUrl.getChangedUrl();
-        this.viewCount = shortenUrl.getViewCount();
+    public ShortenUrlResponseDto(ShortenUrlInfo shortenUrlInfo) {
+        this.originUrl = shortenUrlInfo.getOriginUrl();
+        this.changedUrl = shortenUrlInfo.getChangedUrl();
+        this.viewCount = shortenUrlInfo.getViewCount();
     }
 
 

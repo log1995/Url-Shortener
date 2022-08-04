@@ -27,9 +27,12 @@ public class UrlShortenerController {
 
     // 단축 URL 생성
     @PostMapping("/change")
-    public String changeUserUrlToShortenUrl(@RequestBody ShortenUrlResponseDto shortenUrlResponseDTO) {
-        urlShortenerService.checkHttpContainInUrl(shortenUrlResponseDTO.getOriginUrl());
-        return urlShortenerService.changeUrl(shortenUrlResponseDTO);
+    public String changeUserUrlToShortenUrl(@RequestBody ShortenUrlResponseDto shortenUrlResponseDto) {
+        urlShortenerService.checkValidationOfUrl(shortenUrlResponseDto.getOriginUrl());
+        String changedUrl = urlShortenerService.makeRandomUrl();
+        shortenUrlResponseDto.setChangedUrl(changedUrl);
+        urlShortenerService.saveUrlInfo(shortenUrlResponseDto);
+        return "localhost:8080/" + changedUrl;
     }
 
     // 단축 URL Redirect

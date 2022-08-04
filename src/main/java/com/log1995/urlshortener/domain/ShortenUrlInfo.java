@@ -3,13 +3,14 @@ package com.log1995.urlshortener.domain;
 import javax.persistence.*;
 
 @Entity
-public class ShortenUrl {
+@Table(name = "USER")
+public class ShortenUrlInfo {
 
-    public ShortenUrl() {
+    public ShortenUrlInfo() {
 
     }
 
-    public ShortenUrl(String originUrl, String changedUrl, int viewCount) {
+    public ShortenUrlInfo(String originUrl, String changedUrl, int viewCount) {
         this.originUrl = originUrl;
         this.changedUrl = changedUrl;
         this.viewCount = viewCount;
@@ -24,7 +25,7 @@ public class ShortenUrl {
     @Column(name = "CHANGEDURL")
     private String changedUrl;
 
-    @Column(name = "VIEWCOUNT")
+    @Column(name = "RESPONSETIME")
     private Integer viewCount;
 
     public String getOriginUrl() {
