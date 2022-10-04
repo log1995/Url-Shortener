@@ -1,7 +1,7 @@
 package com.log1995.urlshortener.infrastructure;
 
 import com.log1995.urlshortener.domain.UrlShortenerRepository;
-import com.log1995.urlshortener.domain.User;
+import com.log1995.urlshortener.domain.ShortenUrlInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
@@ -21,27 +21,16 @@ public class DataBaseUrlShortenerRepository implements UrlShortenerRepository {
     }
 
     @Override
-    public void saveUrl(User user) {
-        em.persist(user);
+    public void saveShortenUrlInfo(ShortenUrlInfo shortenUrlInfo) {
+        em.persist(shortenUrlInfo);
     }
 
     @Override
-    public User findUserByChangedUrl(String url) {
-        List<User> resultList =  em.createQuery("select u from User u where u.changedUrl = :url", User.class)
+    public List<ShortenUrlInfo> findShortenUrlInfoByChangedUrl(String url) {
+        List<ShortenUrlInfo> resultList =  em.createQuery("select s from ShortenUrl s where s.changedUrl = :url", ShortenUrlInfo.class)
                 .setParameter("url", url)
                 .getResultList();
-        User user = resultList.get(0);
-        return user;
+
+        return resultList;
     }
-
-    @Override
-    public User findUserByOriginUrl(String originUrl) {
-        List<User> resultList =  em.createQuery("select u from User u where u.originUrl = :url", User.class)
-                .setParameter("url", originUrl)
-                .getResultList();
-        User user = resultList.get(0);
-
-        return user;
-    }
-
 }

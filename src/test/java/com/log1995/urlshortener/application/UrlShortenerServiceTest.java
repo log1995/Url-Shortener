@@ -2,16 +2,20 @@ package com.log1995.urlshortener.application;
 
 import com.log1995.urlshortener.domain.UrlShortenerRepository;
 
-import com.log1995.urlshortener.domain.User;
-import com.log1995.urlshortener.presentation.UserDto;
+import com.log1995.urlshortener.domain.ShortenUrlInfo;
+import com.log1995.urlshortener.exception.TryAgainException;
+import com.log1995.urlshortener.presentation.ShortenUrlResponseDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -26,49 +30,67 @@ public class UrlShortenerServiceTest {
     private UrlShortenerService urlShortenerService;
 
     @Test
-    public void save() {
-        // Given
-        String ORIGIN_URL = "https://www.naver.com";
-
-        UserDto userDto = new UserDto();
-        userDto.setOriginUrl(ORIGIN_URL);
-        
-        // when
-         when(urlShortenerRepository.findUserByChangedUrl(any())).thenReturn(new User(ORIGIN_URL, "1q2w3e4r", 0));
-         String originUrl = urlShortenerService.findOriginUrl("ddd");
-
-        // then
-         assertThat(userDto.getOriginUrl()).isEqualTo(originUrl);
-    }
-
-    @Test
-    public void findResponseCount에_changedUrl로_조회하면_responseTime을_조회할_수_있다() {
+    public void findOriginUrl에_CHANGED_URL로_조회하면_originUrl을_조회할_수_있다() {
         // Given
         String ORIGIN_URL = "https://www.naver.com";
         String CHANGED_URL = "1q2w3e4r";
-        int RESPONSE_COUNT = 1;
+        int VIEW_COUNT = 1;
 
-        UserDto userDto = new UserDto();
-        userDto.setResponseTime(RESPONSE_COUNT);
+        List<ShortenUrlInfo> shortenUrlInfoList = new ArrayList<>();
+        shortenUrlInfoList.add(new ShortenUrlInfo(ORIGIN_URL, CHANGED_URL, VIEW_COUNT));
 
-        when(urlShortenerRepository.findUserByChangedUrl(CHANGED_URL))
-                .thenReturn(new User(ORIGIN_URL, CHANGED_URL, RESPONSE_COUNT));
+        ShortenUrlResponseDto shortenUrlResponseDto = new ShortenUrlResponseDto();
+        shortenUrlResponseDto.setOriginUrl(ORIGIN_URL);
+        
+        // when
+         when(urlShortenerRepository.findShortenUrlInfoByChangedUrl(any()))
+                 .thenReturn(shortenUrlInfoList);
 
-        int responseTime = urlShortenerService.findResponseCount("ddd/" + CHANGED_URL);
+         String originUrl = urlShortenerService.findOriginUrl(CHANGED_URL);
 
-        assertTrue(userDto.getResponseTime() == responseTime);
+        // then
+         assertThat(shortenUrlResponseDto.getOriginUrl()).isEqualTo(originUrl);
     }
 
-//    @Test
-//    void 단축URL을_조회하면_조회_횟수가_1씩_증가한다() {
-//        UserDto userDto = new UserDto();
-//        userDto.setOriginUrl("https://www.naver.com");
-//
-//        urlShortenerService.changeUrl(userDto);
-//        urlShortenerService.findOriginUrl(userDto.getChangedUrl());
-//
-//        int responseCount = urlShortenerService.findResponseCount("localhost:8080/" + userDto.getChangedUrl());
-//        assertThat(userDto.getResponseTime() + 10000 == responseCount);
-//    }
+    @Test
+    public void findViewCount에_changedUrl로_조회하면_viewCount를_조회할_수_있다() {
+        // Given
+        String ORIGIN_URL = "https://www.naver.com";
+        String CHANGED_URL = "1q2w3e4r";
+        int VIEW_COUNT = 1;
 
+        List<ShortenUrlInfo> shortenUrlInfoList = new ArrayList<>();
+        shortenUrlInfoList.add(new ShortenUrlInfo(ORIGIN_URL, CHANGED_URL, VIEW_COUNT));
+
+        ShortenUrlResponseDto shortenUrlResponseDto = new ShortenUrlResponseDto();
+        shortenUrlResponseDto.setViewCount(VIEW_COUNT);
+
+        // when
+        when(urlShortenerRepository.findShortenUrlInfoByChangedUrl(CHANGED_URL))
+                .thenReturn(shortenUrlInfoList);
+
+        int viewCount = urlShortenerService.findViewCount("localhost:8080/" + CHANGED_URL);
+
+        // then
+        assertTrue(shortenUrlResponseDto.getViewCount() == viewCount);
+    }
+
+    @Test
+    public void findShortenUrlInfoByChangedUrl에_리턴_값이_null이_아니면_makeRandomUrl_실행_시_예외가_발생한다() {
+        // Given
+        String ORIGIN_URL = "https://www.naver.com";
+        String CHANGED_URL = "1q2w3e4r";
+        int VIEW_COUNT = 1;
+
+        List<ShortenUrlInfo> shortenUrlInfoList = new ArrayList<>();
+        shortenUrlInfoList.add(new ShortenUrlInfo(ORIGIN_URL, CHANGED_URL, VIEW_COUNT));
+
+        // when
+        when(urlShortenerRepository.findShortenUrlInfoByChangedUrl(any()))
+                .thenReturn(shortenUrlInfoList);
+
+        //then
+        assertThrows(TryAgainException.class, () -> urlShortenerService.makeRandomUrl());
+
+    }
 }
