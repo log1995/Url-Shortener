@@ -30,7 +30,7 @@ public class UrlShortenerServiceTest {
     private UrlShortenerService urlShortenerService;
 
     @Test
-    public void findOriginUrl에_CHANGED_URL로_조회하면_originUrl을_죄회할_수_있다() {
+    public void findOriginUrl에_CHANGED_URL로_조회하면_originUrl을_조회할_수_있다() {
         // Given
         String ORIGIN_URL = "https://www.naver.com";
         String CHANGED_URL = "1q2w3e4r";

@@ -1,6 +1,5 @@
 package com.log1995.urlshortener.application;
 
-import com.log1995.urlshortener.domain.UrlShortenerRepository;
 import com.log1995.urlshortener.presentation.ShortenUrlResponseDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +16,9 @@ import static org.junit.Assert.assertTrue;
 class UrlShortenerServiceIntegrationTest {
 
     @Autowired UrlShortenerService urlShortenerService;
-    @Autowired UrlShortenerRepository urlShortenerRepository;
 
     @Test
-    void 원본URL을_단축하고_조회하면_원본URL이_조회된다() {
+    void 원본URL을_단축하고_단축URL로_조회하면_원본URL이_조회된다() {
         ShortenUrlResponseDto shortenUrlResponseDto = new ShortenUrlResponseDto();
         shortenUrlResponseDto.setOriginUrl("https://www.naver.com");
 

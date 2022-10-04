@@ -21,6 +21,7 @@ public class UrlShortenerService {
     @Autowired
     private final UrlShortenerRepository urlShortenerRepository;
 
+    private static final String REGEX = "^((http|https)://)?(www\\.)?[a-zA-Z0-9]+\\.[a-z]+(\\.[a-z]+)?";
     private static final int MAX_TRY = 10;
     private static final int START = 48;
     private static final int END = 122;
@@ -37,8 +38,7 @@ public class UrlShortenerService {
     }
 
     public void checkValidationOfUrl(String url) {
-        String regex = "^((http|https)://)?(www\\.)?[a-zA-Z0-9]+\\.[a-z]+(\\.[a-z]+)?";
-        if(Pattern.matches(regex, url)) {
+        if(Pattern.matches(REGEX, url)) {
            return;
         }
         throw new InValidUrlException();
